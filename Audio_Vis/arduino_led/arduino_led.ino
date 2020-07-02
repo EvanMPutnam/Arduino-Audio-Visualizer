@@ -1,3 +1,4 @@
+
 /**
  * Author: Evan Putnam
  * Description: This is an arduino sketch to handle audio visualization with the
@@ -10,7 +11,7 @@
 //Make sure you have the FastLED library installed.
 #include <FastLED.h>
 
-#define LED_PIN     5
+#define LED_PIN     4
 #define NUM_LEDS    128
 
 //Array of RGB
@@ -19,6 +20,7 @@ CRGB leds[NUM_LEDS];
 //Two values used to swap in and out light 'profiles'
 static int glob_count = 0;
 static int light_type = 0;
+bool DEBUG = true;
 
 /**
  * Seting up the light interface and begining fast serial transmission.
@@ -35,12 +37,13 @@ void setup() {
  */
 void loop() {
 
+  
   int count = 0;
   while(true) {
       if(Serial.available() > 0){
+        //int val = 254;
         int val = Serial.read();
-        //val = val - '0';
-        if(val == 255){
+        if(val == 255 || count == NUM_LEDS){
           break;  
         }
         switch(light_type){
@@ -75,4 +78,6 @@ void loop() {
   } 
 
   FastLED.show();
+
+  
 }

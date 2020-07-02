@@ -3,9 +3,11 @@ Python file to get sound from a pc and transfer it to an arduino
 for audio visualization.  
 
 Dependencies:
-    pyaudio: PyAudio needs portaudio.h installed on the machine.
+    pyaudio: PyAudio needs portaudio.h installed on the machine. (Conda can install this)
     numpy and scipy: For the mathy stuff
     pyserial: For communication with arduino.
+
+    voicemeeter makes it easy to pipe the output to an input device.
 '''
 import pyaudio
 import numpy as np
@@ -29,7 +31,7 @@ HALF = False #LED Count, if True, is now (CHUNKSIZE/2)/(SCALE_FACTOR/2)
 DEBUG = False
 
 #Com port data
-COM_PORT = "COM5"
+COM_PORT = "COM3"
 COM_BAUD = 115200
 
 #Audio device info
@@ -68,14 +70,16 @@ def main():
     ser = serial.Serial(COM_PORT, COM_BAUD)
 
     #Give a little time to connect.
-    time.sleep(10)
+    time.sleep(5)
     print("Done loading COM port")
 
     #Printing out info on all your sound devices.
     for i in range(p.get_device_count()):
         dev = p.get_device_info_by_index(i)
-        print((i, dev['name'], dev['maxInputChannels']))
+        print((i, dev['name'], dev['maxInputChannels'], dev['defaultSampleRate']))
 
+
+    audio_device_index = int(input("Enter Device Number: "))
     #Don't cross the streams.
     stream = p.open(format=pyaudio.paInt16, channels=1, rate=SAMPLE_RATE, 
                     input=True, frames_per_buffer=CHUNKSIZE, input_device_index=AUDIO_DEVICE_INDEX)
@@ -120,6 +124,7 @@ def main():
         #Write and flush.
         ser.write(bytearray(byteArr))
         ser.flush()
+        #print(byteArr)
 
 
     #We should never hit these but whatever...
